@@ -1,0 +1,80 @@
+# Example .foundry/eng-manifest.yaml — minimal valid manifest.
+# Drop this at <repo-root>/.foundry/eng-manifest.yaml and run
+# `foundry-eng-conformance check` to see it in action.
+#
+# See SCHEMA.md for the full schema. Required vs optional fields are
+# documented there; this file shows a small but complete manifest.
+
+schema_version: "0.1.0"
+apiVersion: foundry.studio/v1
+kind: EngManifest
+
+metadata:
+  name: example-repo
+  uuid: "00000000-0000-0000-0000-000000000000"   # generate a real uuid v4 for your repo
+  owner: tim
+  repo_kind: library          # monorepo | library | service | tool
+  description: "Example showing the manifest shape."
+
+spec:
+  reproducible_build:
+    declared: true
+    source_of_truth: pyproject.toml
+
+  ownership_source:
+    file: CODEOWNERS          # cross-checked by the tool, not duplicated
+
+  # Default exempt_paths are seeded automatically — uncomment to extend.
+  # exempt_paths:
+  #   - "tests/**/*.py"
+  #   - "scripts/**/*.py"
+  #   - "migrations/**/*.py"
+  #   - "**/__init__.py"
+  #   - "conftest.py"
+  #   - "setup.py"
+  #   - "noxfile.py"
+
+  subsystems:
+    - id: "core"
+      title: "Core domain logic"
+      owner: tim
+      lifecycle_stage: adopt    # assess | trial | adopt | hold | rejected | retire (JOS-D0028)
+      plane: control            # optional: control | data | management
+      layer: L2                 # optional: L1 | L2 | L3
+      code_paths:
+        - "src/example/core/**/*.py"
+      allowed_outbound:
+        - external: yaml
+        - external: pydantic
+      # published_interfaces is REQUIRED only if some other subsystem
+      # depends on this one. Internal-only leaves can omit it.
+      published_interfaces:
+        python:
+          - "example.core.api"
+
+    - id: "adapters"
+      title: "Adapter layer"
+      owner: tim
+      lifecycle_stage: adopt
+      plane: data
+      layer: L3
+      code_paths:
+        - "src/example/adapters/**/*.py"
+      allowed_outbound:
+        - subsystem: core
+          why: "Adapters consume core API"
+        - external: httpx
+
+  # Exceptions point at JOS-R16 governance-variance records, not minted here.
+  # exceptions:
+  #   - subsystem: core
+  #     rule: "allowed_outbound.no_external_httpx"
+  #     jos_variance_id: "JOS-VAR-2026-05-25-001"
+  #     until: "2026-08-01"
+  #     reason: "Temporary HTTP shim during migration"
+
+  # Catch-all buckets — declared paths under retire (path:, NOT subsystem:).
+  # catch_all_buckets:
+  #   - path: "src/legacy/**/*.py"
+  #     rationale: "Legacy dir under retire; splits across new subsystems"
+  #     sunset_target: "2026-09-01"
