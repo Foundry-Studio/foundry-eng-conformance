@@ -141,3 +141,82 @@ class TestStructureCoverage:
         assert result.violation_count == 1
         assert "src/rogue/thing.py" in result.uncovered
         assert "src/legacy/stuff.py" in result.catch_all_under_retire
+
+
+class TestDeferredPaths:
+    """v0.1.1 — deferred_paths field (out-of-scope-this-pass, distinct from exempt)."""
+
+    def test_deferred_file_tracked_separately(self, tmp_path, write_manifest):
+        _touch(tmp_path / "src" / "alpha" / "service.py")
+        _touch(tmp_path / "platform" / "thing.py")   # deferred
+        path = write_manifest(
+            {"spec": {
+                "deferred_paths": [
+                    {
+                        "path": "platform/**/*.py",
+                        "reason": "Deferred to follow-on reorg pass",
+                        "until": "2026-09-01",
+                    }
+                ]
+            }}
+        )
+        m = load_manifest(path)
+        result = run_structure_coverage(m, tmp_path)
+
+        assert result.files_deferred == 1
+        assert "platform/thing.py" in result.deferred
+        assert "platform/thing.py" not in result.uncovered
+        assert result.passed   # deferred files don't count as violations
+
+    def test_deferred_takes_precedence_over_subsystem_match(
+        self, tmp_path, write_manifest
+    ):
+        """A file matching BOTH deferred + subsystem code_paths is treated as deferred."""
+        _touch(tmp_path / "src" / "alpha" / "deferred_thing.py")
+        path = write_manifest(
+            {"spec": {
+                "deferred_paths": [
+                    {
+                        "path": "src/alpha/deferred_*.py",
+                        "reason": "specific file deferred",
+                    }
+                ]
+            }}
+        )
+        m = load_manifest(path)
+        result = run_structure_coverage(m, tmp_path)
+
+        assert "src/alpha/deferred_thing.py" in result.deferred
+        assert "src/alpha/deferred_thing.py" not in result.covered
+
+    def test_exempt_takes_precedence_over_deferred(self, tmp_path, write_manifest):
+        """exempt_paths is the highest priority (genuine non-subsystem files)."""
+        _touch(tmp_path / "tests" / "test_alpha.py")
+        path = write_manifest(
+            {"spec": {
+                "deferred_paths": [
+                    {"path": "tests/**/*.py", "reason": "would conflict"}
+                ]
+            }}
+        )
+        m = load_manifest(path)
+        result = run_structure_coverage(m, tmp_path)
+
+        # exempt_paths default covers tests/, so file is exempt (not deferred)
+        assert result.files_exempt >= 1
+        assert "tests/test_alpha.py" not in result.deferred
+
+    def test_deferred_without_until_date_accepted(self, tmp_path, write_manifest):
+        """`until` is optional — deferred can be open-ended."""
+        _touch(tmp_path / "src" / "alpha" / "service.py")
+        _touch(tmp_path / "tools" / "scratch.py")
+        path = write_manifest(
+            {"spec": {
+                "deferred_paths": [
+                    {"path": "tools/**/*.py", "reason": "ops scripts"}
+                ]
+            }}
+        )
+        m = load_manifest(path)
+        result = run_structure_coverage(m, tmp_path)
+        assert result.files_deferred == 1

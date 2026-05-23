@@ -20,6 +20,8 @@ def format_structure_coverage(res: StructureCoverageResult) -> str:
     lines.append(f"  Scanned: {res.files_scanned} .py files")
     lines.append(f"  Covered: {res.files_covered}")
     lines.append(f"  Exempt:  {res.files_exempt}")
+    if res.files_deferred:
+        lines.append(f"  Deferred (out-of-scope this pass): {res.files_deferred}")
     if res.catch_all_under_retire:
         lines.append(
             f"  Catch-all (under retire, not a violation): "

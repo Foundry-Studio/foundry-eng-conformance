@@ -160,6 +160,27 @@ class CatchAllBucket(BaseModel):
     jos_variance_id: str | None = None
 
 
+class DeferredPath(BaseModel):
+    """A path explicitly out-of-scope-this-pass (QC fold-in C, v0.1.1).
+
+    Distinct from `exempt_paths` which is for permanent non-subsystem
+    exemptions (tests/, __init__.py, etc.). `deferred_paths` entries
+    carry a `reason` and ideally a review date (`until`) — they make
+    "out of scope" structurally visible instead of buried in comments.
+
+    The tool reports deferred files separately from exempt + uncovered:
+    counted as `files_deferred` in the structure-coverage details. Does
+    not contribute to violations.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    path: str
+    reason: str
+    until: str | None = None   # ISO date — when to revisit
+    jos_variance_id: str | None = None
+
+
 class ReorgPointer(BaseModel):
     """Transient pointer at the reorg's taxonomy source.
 
@@ -189,6 +210,7 @@ class Spec(BaseModel):
             "noxfile.py",
         ]
     )
+    deferred_paths: list[DeferredPath] = Field(default_factory=list)
     exceptions: list[Exception_] = Field(default_factory=list)
     catch_all_buckets: list[CatchAllBucket] = Field(default_factory=list)
     reorg: ReorgPointer | None = None
@@ -224,7 +246,8 @@ class EngManifest(BaseModel):
     @classmethod
     def _supported_version(cls, v: str) -> str:
         # v0.1.x is the only supported range right now. Bumping major
-        # (1.0.0) requires a tool release.
+        # (1.0.0) requires a tool release. v0.1.1 added `deferred_paths`
+        # field (backward-compatible — defaults to []).
         if not v.startswith("0.1."):
             raise ValueError(
                 f"schema_version {v!r} not supported by this tool version. "

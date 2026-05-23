@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "foundry-eng-conformance"
-version = "0.1.0"
+version = "0.1.1"
 description = "Foundry-Studio eng-conformance tool — implements JOS-S53 checks (structure-coverage + dependency-direction/acyclic) against a per-repo .foundry/eng-manifest.yaml."
 readme = "README.md"
 requires-python = ">=3.11"

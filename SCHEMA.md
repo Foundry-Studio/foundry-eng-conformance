@@ -14,6 +14,12 @@ revisions:
       hold/rejected/retire); catch_all_buckets renamed to use path:
       not subsystem:; published_interfaces required only when
       depended-upon.
+  - 2026-05-22 v0.1.1 — added `spec.deferred_paths` field (QC fold-in C).
+      Distinct from `exempt_paths`: out-of-scope-this-pass with `reason`
+      required and optional `until` + `jos_variance_id`. Backward-
+      compatible (defaults to []). Used by FAS Phase 5 to move
+      platform/, products/, internal-tooling/ from `exempt_paths` into
+      structurally-visible deferred entries. 9 new tests added.
 purpose: >
   The shared contract between the FAS src/ reorg and the
   foundry-eng-conformance tool. Both consume this schema; if they

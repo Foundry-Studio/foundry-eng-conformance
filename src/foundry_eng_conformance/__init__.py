@@ -10,5 +10,5 @@ Consumes `.foundry/eng-manifest.yaml` in the target repo. See SCHEMA.md
 for the manifest contract.
 """
 
-__version__ = "0.1.0"
-__schema_version__ = "0.1.0"
+__version__ = "0.1.1"
+__schema_version__ = "0.1.1"

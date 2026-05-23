@@ -33,6 +33,7 @@ class StructureCoverageResult:
     files_scanned: int = 0
     files_covered: int = 0
     files_exempt: int = 0
+    files_deferred: int = 0   # v0.1.1: out-of-scope-this-pass per spec.deferred_paths
 
     # path -> subsystem_id
     covered: dict[str, str] = field(default_factory=dict)
@@ -42,6 +43,8 @@ class StructureCoverageResult:
     ambiguous: dict[str, list[str]] = field(default_factory=dict)
     # path -> catch_all_buckets entry path that matched it
     catch_all_under_retire: dict[str, str] = field(default_factory=dict)
+    # path -> deferred_paths entry path that matched it
+    deferred: dict[str, str] = field(default_factory=dict)
 
     @property
     def passed(self) -> bool:
@@ -60,6 +63,7 @@ class StructureCoverageResult:
             "files_scanned": self.files_scanned,
             "files_covered": self.files_covered,
             "files_exempt": self.files_exempt,
+            "files_deferred": self.files_deferred,   # v0.1.1
             "files_uncovered": len(self.uncovered),
             "files_ambiguous": len(self.ambiguous),
             "files_catch_all_under_retire": len(self.catch_all_under_retire),
@@ -196,11 +200,26 @@ def run_structure_coverage(
     result.files_scanned = len(py_files)
 
     exempt_globs = manifest.spec.exempt_paths
+    deferred_globs = [(d.path, d) for d in manifest.spec.deferred_paths]
     catch_all_globs = [(b.path, b) for b in manifest.spec.catch_all_buckets]
 
     for rel in py_files:
         if _matches_any(rel, exempt_globs):
             result.files_exempt += 1
+            continue
+
+        # Deferred paths — explicit out-of-scope-this-pass (v0.1.1).
+        # Checked AFTER exempt_paths (genuine non-subsystem files take
+        # precedence) but BEFORE subsystem matching, because deferred
+        # paths shouldn't be claimed by subsystems even if a glob would
+        # otherwise match.
+        matched_deferred = next(
+            (d for path, d in deferred_globs if _matches_any(rel, [path])),
+            None,
+        )
+        if matched_deferred:
+            result.deferred[rel] = matched_deferred.path
+            result.files_deferred += 1
             continue
 
         matched_subsystems = [

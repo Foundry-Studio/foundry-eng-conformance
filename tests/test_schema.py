@@ -218,6 +218,65 @@ class TestOutboundEdgeExclusivity:
             load_manifest(path)
 
 
+class TestDeferredPaths:
+    """v0.1.1 — spec.deferred_paths schema field."""
+
+    def test_minimal_entry_accepted(self, write_manifest):
+        path = write_manifest(
+            {"spec": {
+                "deferred_paths": [
+                    {"path": "platform/**/*.py", "reason": "deferred"}
+                ]
+            }}
+        )
+        m = load_manifest(path)
+        assert len(m.spec.deferred_paths) == 1
+        assert m.spec.deferred_paths[0].path == "platform/**/*.py"
+        assert m.spec.deferred_paths[0].until is None
+
+    def test_with_until_and_variance(self, write_manifest):
+        path = write_manifest(
+            {"spec": {
+                "deferred_paths": [
+                    {
+                        "path": "products/**/*.py",
+                        "reason": "pending scope decision",
+                        "until": "2026-09-01",
+                        "jos_variance_id": "JOS-VAR-2026-05-22-001",
+                    }
+                ]
+            }}
+        )
+        m = load_manifest(path)
+        dp = m.spec.deferred_paths[0]
+        assert dp.until == "2026-09-01"
+        assert dp.jos_variance_id == "JOS-VAR-2026-05-22-001"
+
+    def test_reason_required(self, write_manifest):
+        with pytest.raises(ManifestLoadError):
+            path = write_manifest(
+                {"spec": {
+                    "deferred_paths": [
+                        {"path": "x/**/*.py"}   # missing reason
+                    ]
+                }}
+            )
+            load_manifest(path)
+
+    def test_default_empty(self, write_manifest):
+        path = write_manifest()
+        m = load_manifest(path)
+        assert m.spec.deferred_paths == []
+
+
+class TestSchemaVersion:
+    def test_v0_1_1_accepted(self, write_manifest):
+        """schema_version 0.1.1 is supported (backward-compatible with 0.1.0)."""
+        path = write_manifest({"schema_version": "0.1.1"})
+        m = load_manifest(path)
+        assert m.schema_version == "0.1.1"
+
+
 class TestCatchAllBucket:
     def test_path_field_accepted(self, write_manifest):
         """Per Atlas review: catch_all_buckets uses `path:`, not `subsystem:`."""
