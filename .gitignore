@@ -27,3 +27,6 @@ env/
 # OS
 .DS_Store
 Thumbs.db
+
+# Agent scratch zone (JOS-R20) - never commit
+.scratchpad/
