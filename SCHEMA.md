@@ -8,7 +8,7 @@ created: 2026-05-22
 last_modified: 2026-05-22
 revisions:
   - 2026-05-22 v0 first draft — Part B first deliverable
-  - 2026-05-22 v0.1 approved with 4 fold-ins (review):
+  - 2026-05-22 v0.1 approved with 4 fold-ins (Atlas review):
       mode flag (--mode=report|enforce); exempt_paths promoted to v0;
       lifecycle_stage enum aligned to JOS-D0028 (assess/trial/adopt/
       hold/rejected/retire); catch_all_buckets renamed to use path:

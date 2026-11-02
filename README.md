@@ -67,7 +67,7 @@ pytest
 
 ## Mode flag (advisory window vs. enforce)
 
-Per the review pattern ruled 2026-05-22, conformance pilots open in
+Per the 2026-05-22 schema review ruling, conformance pilots open in
 **report mode** first:
 
 | Mode           | Behavior                                                                |
