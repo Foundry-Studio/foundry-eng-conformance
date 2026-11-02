@@ -67,7 +67,7 @@ pytest
 
 ## Mode flag (advisory window vs. enforce)
 
-Per the Atlas review pattern (2026-05-22), conformance pilots open in
+Per the review pattern ruled 2026-05-22, conformance pilots open in
 **report mode** first:
 
 | Mode           | Behavior                                                                |

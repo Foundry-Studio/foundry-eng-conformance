@@ -6,7 +6,7 @@ Subcommands:
              the code tree or build the import graph.
 
 The `check` mode flag (`--mode=report|enforce`) controls CI exit codes
-per Atlas review 2026-05-22:
+per the review ruling of 2026-05-22:
 
     --mode=report   (default — for the FAS pilot's advisory window)
         Emit evidence, print violation counts, ALWAYS exit 0.

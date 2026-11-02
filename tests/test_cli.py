@@ -1,4 +1,4 @@
-"""Tests for the CLI — exit codes + mode flag behavior (Atlas review)."""
+"""Tests for the CLI — exit codes + mode flag behavior (2026-05-22 review)."""
 
 from __future__ import annotations
 
@@ -48,7 +48,7 @@ class TestCLIExitCodes:
 
 
 class TestModeFlag:
-    """Atlas review 2026-05-22: --mode=report ALWAYS exits 0 even on
+    """Review ruling 2026-05-22: --mode=report ALWAYS exits 0 even on
     violations; --mode=enforce exits non-zero on any fail."""
 
     def test_report_mode_exits_zero_on_violation(

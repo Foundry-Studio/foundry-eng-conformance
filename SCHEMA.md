@@ -8,7 +8,7 @@ created: 2026-05-22
 last_modified: 2026-05-22
 revisions:
   - 2026-05-22 v0 first draft — Part B first deliverable
-  - 2026-05-22 v0.1 approved with 4 fold-ins (Atlas review):
+  - 2026-05-22 v0.1 approved with 4 fold-ins (review):
       mode flag (--mode=report|enforce); exempt_paths promoted to v0;
       lifecycle_stage enum aligned to JOS-D0028 (assess/trial/adopt/
       hold/rejected/retire); catch_all_buckets renamed to use path:
@@ -120,7 +120,7 @@ spec:
   # Files matching ANY of these globs are exempt from structure-coverage.
   # Seeded with the obvious defaults; pilot will surface more (top-level
   # __init__.py, app entrypoints, config modules typically end up here).
-  # Per Atlas review: implement now rather than defer — needed almost
+  # Per the 2026-05-22 review: implement now rather than defer — needed almost
   # immediately at pilot time.
   exempt_paths:
     - "tests/**/*.py"
@@ -170,7 +170,7 @@ spec:
 
       published_interfaces:                # AD-3 — required only if subsystem has inbound edges
         # What other code MAY consume from this subsystem. Stable surface.
-        # Per Atlas review (2026-05-22): required ONLY for subsystems that
+        # Per the review ruling (2026-05-22): required ONLY for subsystems that
         # are imported by other subsystems (have inbound edges). Internal-only
         # leaves can omit the block to avoid boilerplate empties.
         # The tool detects inbound edges from other subsystems'
@@ -252,7 +252,7 @@ spec:
   # Guide). The tool reports any file under these paths as a "catch-all
   # under retire" finding, distinct from an "undeclared" finding. Each entry
   # SHOULD have a sunset_target date and ideally a JOS-R16 variance link.
-  # Renamed from `subsystem:` to `path:` per Atlas review 2026-05-22 — these
+  # Renamed from `subsystem:` to `path:` per the review ruling of 2026-05-22 — these
   # are undeclared paths, not subsystems.
   catch_all_buckets:
     - path: "src/services/**/*.py"
@@ -304,7 +304,7 @@ Gate behavior (CI) — depends on `--mode` flag:
   AD-2 fix: "verify evidence exists for required checks," not "did
   CI run").
 
-Rollout discipline per Atlas review 2026-05-22:
+Rollout discipline per the review ruling of 2026-05-22:
 
 1. FAS pilot opens in `--mode=report`.
 2. Reorg lands; violation count tracked over time as a single number.
@@ -428,7 +428,7 @@ A future `foundry-to-backstage` adapter is a ~50 LOC YAML rewriter.
   Python-specifics (`published_interfaces.python`,
   `allowed_outbound.external` as Python module names). Per AD-9, these
   should eventually be in two layers: universal + stack pack. **Per
-  Atlas review 2026-05-22**: do NOT declare the schema "stable" or
+  the review ruling of 2026-05-22**: do NOT declare the schema "stable" or
   onboard CIP until the universal-vs-stack-pack split decision is made.
   CIP is the second shape that tests it — the CIP shape-check IS the
   AD-9 test. The split decision surfaces at that point, not before.
