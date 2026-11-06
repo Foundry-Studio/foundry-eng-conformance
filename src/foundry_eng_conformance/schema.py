@@ -148,7 +148,7 @@ class Exception_(BaseModel):
 class CatchAllBucket(BaseModel):
     """Declared known-catch-all under retire (JOS-S53 § Gap Analysis).
 
-    Renamed `subsystem:` → `path:` per Atlas review 2026-05-22 — these
+    Renamed `subsystem:` → `path:` per the review ruling of 2026-05-22 — these
     are undeclared paths, not subsystems.
     """
 
@@ -264,7 +264,7 @@ class EngManifest(BaseModel):
     def inbound_edges(self, sid: str) -> list[str]:
         """Return the ids of subsystems that reference `sid` in their
         allowed_outbound. Used to enforce the conditional
-        published_interfaces rule (AD-3 / Atlas review 2026-05-22)."""
+        published_interfaces rule (AD-3 / review ruling 2026-05-22)."""
         result = []
         for s in self.spec.subsystems:
             if s.id == sid:
@@ -325,7 +325,7 @@ def _enforce_unique_subsystem_ids(m: EngManifest) -> None:
 
 
 def _enforce_conditional_published_interfaces(m: EngManifest) -> None:
-    """Per Atlas review 2026-05-22: published_interfaces is required
+    """Per the review ruling of 2026-05-22: published_interfaces is required
     ONLY when the subsystem has inbound edges (is depended-upon)."""
     failures = []
     for s in m.spec.subsystems:

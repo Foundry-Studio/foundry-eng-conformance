@@ -148,7 +148,7 @@ class TestCrossFieldValidation:
             load_manifest(path)
 
     def test_published_interfaces_required_when_inbound(self, write_manifest):
-        """Per Atlas review: required only if depended-upon."""
+        """Per the 2026-05-22 review: required only if depended-upon."""
         with pytest.raises(ManifestLoadError, match="published_interfaces"):
             path = write_manifest(
                 {"spec": {"subsystems": [
@@ -279,7 +279,7 @@ class TestSchemaVersion:
 
 class TestCatchAllBucket:
     def test_path_field_accepted(self, write_manifest):
-        """Per Atlas review: catch_all_buckets uses `path:`, not `subsystem:`."""
+        """Per the 2026-05-22 review: catch_all_buckets uses `path:`, not `subsystem:`."""
         path = write_manifest(
             {"spec": {
                 "catch_all_buckets": [
